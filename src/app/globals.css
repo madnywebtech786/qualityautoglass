@@ -1,26 +1,367 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* ============================================================
+   THEME VARIABLES — edit here to change the entire site theme
+   ============================================================ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Brand colors */
+  --color-brand-primary:       #0a6af5;
+  --color-brand-primary-light: #3b8eff;
+  --color-brand-primary-dark:  #0050cc;
+  --color-brand-accent:        #00d4ff;
+  --color-brand-accent-muted:  #e0f7ff;
+
+  /* Neutrals */
+  --color-surface:             #ffffff;
+  --color-surface-alt:         #f4f7fc;
+  --color-surface-glass:       rgba(255,255,255,0.72);
+  --color-border:              #dde4f0;
+  --color-border-strong:       #b8c8e8;
+
+  /* Text */
+  --color-text-primary:        #0a0f1e;
+  --color-text-secondary:      #3a4568;
+  --color-text-muted:          #8494b2;
+  --color-text-inverse:        #ffffff;
+
+  /* Status / Promo */
+  --color-success:             #0ead69;
+  --color-promo:               #ff6b2b;
+
+  /* Shadows */
+  --shadow-card:   0 4px 24px 0 rgba(10,106,245,0.08);
+  --shadow-glow:   0 0 40px 0  rgba(10,106,245,0.18);
+  --shadow-deep:   0 20px 60px 0 rgba(10,20,80,0.14);
+
+  /* Radii */
+  --radius-card:   1.25rem;
+  --radius-btn:    0.625rem;
+
+  /* Typography */
+  --font-display: var(--font-syne);
+  --font-body:    var(--font-dm-sans);
+  --font-mono:    var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================================
+   BASE
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-body), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+}
+
+/* ============================================================
+   KEYFRAME ANIMATIONS
+   ============================================================ */
+
+/* Fade up — general entrance */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Fade in */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Scale in */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.88); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Slide in from right (drawer) */
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* Slide out to right (drawer close) */
+@keyframes slideOutRight {
+  from { transform: translateX(0);    opacity: 1; }
+  to   { transform: translateX(100%); opacity: 0; }
+}
+
+/* Shimmer line — hero decorative line */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+/* Float — subtle levitation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+/* Pulse ring — hero badge */
+@keyframes pulseRing {
+  0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(10,106,245,0.4); }
+  70%  { transform: scale(1);    box-shadow: 0 0 0 18px rgba(10,106,245,0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(10,106,245,0); }
+}
+
+/* Gradient drift — background mesh */
+@keyframes gradientDrift {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+/* Beam sweep — hero diagonal light */
+@keyframes beamSweep {
+  0%   { transform: translateX(-120%) skewX(-20deg); opacity: 0; }
+  10%  { opacity: 0.5; }
+  90%  { opacity: 0.5; }
+  100% { transform: translateX(220%) skewX(-20deg); opacity: 0; }
+}
+
+/* Draw line — section dividers */
+@keyframes drawLine {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+/* Counter spin — decorative badge icon */
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Stagger reveal */
+@keyframes staggerReveal {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Glass card hover shine */
+@keyframes cardShine {
+  0%   { left: -100%; }
+  100% { left: 200%; }
+}
+
+/* Trust badge scroll */
+@keyframes scrollX {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ============================================================
+   ANIMATION UTILITY CLASSES
+   ============================================================ */
+.animate-fade-up       { animation: fadeUp 0.7s cubic-bezier(0.22,1,0.36,1) both; }
+.animate-fade-in       { animation: fadeIn 0.6s ease both; }
+.animate-scale-in      { animation: scaleIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+.animate-float         { animation: float 5s ease-in-out infinite; }
+.animate-pulse-ring    { animation: pulseRing 2.5s cubic-bezier(0.66,0,0,1) infinite; }
+.animate-gradient      { animation: gradientDrift 8s ease infinite; }
+.animate-spin-slow     { animation: spinSlow 18s linear infinite; }
+.animate-scroll-x      { animation: scrollX 28s linear infinite; }
+.animate-draw-line     { animation: drawLine 1.2s cubic-bezier(0.22,1,0.36,1) both; }
+
+/* Delay helpers */
+.delay-100  { animation-delay: 100ms; }
+.delay-150  { animation-delay: 150ms; }
+.delay-200  { animation-delay: 200ms; }
+.delay-300  { animation-delay: 300ms; }
+.delay-400  { animation-delay: 400ms; }
+.delay-500  { animation-delay: 500ms; }
+.delay-600  { animation-delay: 600ms; }
+.delay-700  { animation-delay: 700ms; }
+.delay-800  { animation-delay: 800ms; }
+.delay-1000 { animation-delay: 1000ms; }
+
+/* ============================================================
+   DRAWER ANIMATION CLASSES
+   ============================================================ */
+.drawer-enter { animation: slideInRight  0.38s cubic-bezier(0.22,1,0.36,1) both; }
+.drawer-exit  { animation: slideOutRight 0.32s cubic-bezier(0.55,0,1,0.45) both; }
+
+/* ============================================================
+   REUSABLE COMPONENT STYLES
+   ============================================================ */
+
+/* Glassmorphism card */
+.glass-card {
+  background: var(--color-surface-glass);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid rgba(255,255,255,0.65);
+  box-shadow: var(--shadow-card);
+}
+
+/* Shimmer text effect */
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-brand-primary) 0%,
+    var(--color-brand-accent) 40%,
+    var(--color-brand-primary) 60%,
+    var(--color-brand-primary-dark) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Gradient text (static) */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-brand-primary) 0%, var(--color-brand-accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Section heading accent line */
+.heading-line::after {
+  content: '';
+  display: block;
+  width: 52px;
+  height: 3px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--color-brand-primary), var(--color-brand-accent));
+  margin-top: 10px;
+}
+
+.heading-line-center::after {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Noise texture overlay */
+.noise-overlay {
+  position: relative;
+}
+.noise-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  border-radius: inherit;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar        { width: 6px; }
+::-webkit-scrollbar-track  { background: var(--color-surface-alt); }
+::-webkit-scrollbar-thumb  { background: var(--color-border-strong); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-brand-primary); }
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 3px;
+}
+
+/* Selection */
+::selection {
+  background: var(--color-brand-primary);
+  color: #fff;
+}
+
+/* ============================================================
+   CARD HOVER SHINE EFFECT
+   ============================================================ */
+.card-shine {
+  position: relative;
+  overflow: hidden;
+}
+.card-shine::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -100%;
+  width: 60%;
+  height: 200%;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255,255,255,0.45) 50%,
+    transparent 80%
+  );
+  transform: skewX(-20deg);
+  transition: left 0s;
+}
+.card-shine:hover::after {
+  left: 200%;
+  transition: left 0.55s ease;
+}
+
+/* ============================================================
+   NAV DROPDOWN
+   ============================================================ */
+.nav-dropdown {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.22s ease, visibility 0.22s, transform 0.22s cubic-bezier(0.22,1,0.36,1);
+}
+.nav-dropdown-trigger:hover .nav-dropdown,
+.nav-dropdown-trigger:focus-within .nav-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   SCROLL-REVEAL  — CSS scroll-driven (no JS required)
+   Falls back to visible on browsers without support.
+   ============================================================ */
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: revealUp 0.7s cubic-bezier(0.22,1,0.36,1) both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 35%;
+  }
+
+  /* Stagger children */
+  .reveal-stagger > * {
+    animation: revealUp 0.6s cubic-bezier(0.22,1,0.36,1) both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 35%;
+  }
+  .reveal-stagger > *:nth-child(1) { animation-delay: 0ms;   }
+  .reveal-stagger > *:nth-child(2) { animation-delay: 80ms;  }
+  .reveal-stagger > *:nth-child(3) { animation-delay: 160ms; }
+  .reveal-stagger > *:nth-child(4) { animation-delay: 240ms; }
+  .reveal-stagger > *:nth-child(5) { animation-delay: 320ms; }
+  .reveal-stagger > *:nth-child(6) { animation-delay: 400ms; }
+  .reveal-stagger > *:nth-child(7) { animation-delay: 480ms; }
+  .reveal-stagger > *:nth-child(8) { animation-delay: 560ms; }
+}
+
+/* JS-toggled fallback — kept for components that still use it */
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-stagger.revealed > * {
+  opacity: 1;
+  transform: translateY(0);
 }
