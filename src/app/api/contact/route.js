@@ -104,10 +104,8 @@ function buildEmailHtml({ firstName, lastName, email, vehicle, serviceTypes, oth
                 <tr>
                   <td>
                     <div>
-                      <div style="display:inline-block;width:36px;height:36px;background:rgba(255,255,255,0.18);border-radius:10px;text-align:center;line-height:36px;vertical-align:middle;">
-                        <span style="color:#fff;font-size:18px;font-weight:700;">Q</span>
-                      </div>
-                      <span style="color:#fff;font-size:17px;font-weight:700;letter-spacing:-0.02em;vertical-align:middle;margin-left:10px;">Quality Auto Glass Ltd</span>
+                      <img src="https://qualityautoglass.ca/images/qualityglass-logo.png" alt="Quality Auto Glass Ltd" width="140" height="50" style="display:inline-block;vertical-align:middle;height:44px;width:auto;" />
+                      <span style="color:#fff;font-size:17px;font-weight:700;letter-spacing:-0.02em;vertical-align:middle;margin-left:12px;">Quality Auto Glass Ltd</span>
                     </div>
                     <p style="color:rgba(255,255,255,0.75);font-size:12px;margin:8px 0 0;letter-spacing:0.12em;text-transform:uppercase;">New Website Inquiry</p>
                   </td>

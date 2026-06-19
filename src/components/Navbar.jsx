@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X, ChevronDown, Phone, Shield } from "lucide-react";
 import { services } from "@/data/services";
 
@@ -77,18 +78,15 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-5 lg:px-8 flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[var(--color-brand-primary)] shadow-[var(--shadow-glow)] transition-transform duration-300 group-hover:scale-105">
-              <Shield size={18} className="text-white" strokeWidth={2.5} />
-            </span>
-            <div className="flex flex-col leading-tight">
-              <span className="font-display font-800 text-[15px] text-[var(--color-text-primary)] tracking-tight">
-                Quality Auto Glass
-              </span>
-              <span className="text-[10px] font-500 text-[var(--color-brand-primary)] tracking-widest uppercase">
-                Ltd — Calgary
-              </span>
-            </div>
+          <Link href="/" className="flex items-center group shrink-0">
+            <Image
+              src="/images/qualityglass-logo.png"
+              alt="Quality Auto Glass Ltd"
+              width={160}
+              height={56}
+              className="h-12 w-auto object-contain transition-opacity duration-200 group-hover:opacity-80"
+              priority
+            />
           </Link>
 
           {/* Desktop Nav — 6 links */}

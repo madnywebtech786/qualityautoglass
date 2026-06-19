@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Shield, Phone, Mail, MapPin, Clock } from "lucide-react";
+import Image from "next/image";
+import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import { services } from "@/data/services";
 
 const FOOTER_LINKS = [
@@ -37,18 +38,15 @@ export default function Footer() {
 
           {/* Brand column */}
           <div className="lg:col-span-2 flex flex-col gap-6">
-            <Link href="/" className="flex items-center gap-2.5">
-              <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--color-brand-primary)] shadow-[var(--shadow-glow)]">
-                <Shield size={20} className="text-white" strokeWidth={2.5} />
-              </span>
-              <div className="flex flex-col leading-tight">
-                <span className="font-display font-800 text-[16px] text-white tracking-tight">
-                  Quality Auto Glass
-                </span>
-                <span className="text-[10px] font-500 text-[var(--color-brand-accent)] tracking-widest uppercase">
-                  Ltd — Calgary
-                </span>
-              </div>
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/images/qualityglass-logo.png"
+                alt="Quality Auto Glass Ltd"
+                width={160}
+                height={56}
+                className="h-20 w-auto object-contain "
+                loading="lazy"
+              />
             </Link>
 
             <p className="text-[14px] leading-[1.75] text-white/60 max-w-xs">
