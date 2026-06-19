@@ -2,22 +2,48 @@
 
 import { useState } from "react";
 import { ArrowRight, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
-import ServiceSelect from "./ServiceSelect";
 
-const EMPTY = { name: "", phone: "", email: "", service: "", message: "" };
+const SERVICE_TYPES = [
+  "Windshield",
+  "Front Vent Glass",
+  "Front Door Glass",
+  "Sunroof",
+  "Rear Door Glass",
+  "Rear Vent Glass",
+  "Rear Quarter Glass",
+  "Back Glass",
+];
 
-// Client-side validation mirrors server rules
+const OTHER_DETAILS = [
+  "Rain Sensor",
+  "Heated Glass",
+  "Lane Departure Warning",
+  "Heads-Up Display",
+];
+
+const EMPTY = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  vehicle: "",
+  serviceTypes: [],
+  otherDetails: [],
+  message: "",
+};
+
 function validate(form) {
-  if (!form.name.trim() || form.name.trim().length < 2)
-    return "Please enter your full name.";
+  if (!form.firstName.trim() || form.firstName.trim().length < 2)
+    return "Please enter your first name.";
+  if (!form.lastName.trim() || form.lastName.trim().length < 2)
+    return "Please enter your last name.";
   if (!form.email.trim())
     return "Email address is required.";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()))
     return "Please enter a valid email address.";
-  if (form.phone && !/^[\d\s\-\+\(\)\.]+$/.test(form.phone))
-    return "Phone number contains invalid characters.";
+  if (!form.vehicle.trim())
+    return "Please enter your vehicle year, make & model.";
   if (form.message && form.message.length > 2000)
-    return "Message must be under 2000 characters.";
+    return "Comments must be under 2000 characters.";
   return null;
 }
 
@@ -25,26 +51,32 @@ export default function ContactForm({
   headerLabel = "Free Estimate",
   headerTitle = "Tell us about your vehicle",
 }) {
-  const [form, setForm]       = useState(EMPTY);
-  const [status, setStatus]   = useState("idle"); // idle | loading | success | error
-  const [errorMsg, setErrorMsg] = useState("");
+  const [form, setForm]           = useState(EMPTY);
+  const [status, setStatus]       = useState("idle");
+  const [errorMsg, setErrorMsg]   = useState("");
   const [fieldError, setFieldError] = useState("");
 
   function handleChange(e) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
-    // Clear field error as user types
     if (fieldError) setFieldError("");
+  }
+
+  function handleCheckbox(group, value) {
+    setForm((f) => {
+      const current = f[group];
+      return {
+        ...f,
+        [group]: current.includes(value)
+          ? current.filter((v) => v !== value)
+          : [...current, value],
+      };
+    });
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-
-    // Client validation
     const clientError = validate(form);
-    if (clientError) {
-      setFieldError(clientError);
-      return;
-    }
+    if (clientError) { setFieldError(clientError); return; }
 
     setStatus("loading");
     setErrorMsg("");
@@ -56,15 +88,12 @@ export default function ContactForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
         setStatus("error");
         setErrorMsg(data.error || "Something went wrong. Please try again.");
         return;
       }
-
       setStatus("success");
     } catch {
       setStatus("error");
@@ -104,10 +133,9 @@ export default function ContactForm({
           box-shadow: 0 0 0 3px rgba(10,106,245,0.1);
         }
         .cf-input:disabled, .cf-textarea:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
+          opacity: 0.6; cursor: not-allowed;
         }
-        .cf-textarea { resize: vertical; min-height: 110px; }
+        .cf-textarea { resize: vertical; min-height: 100px; }
         .cf-label {
           display: block;
           font-size: 11.5px;
@@ -116,6 +144,47 @@ export default function ContactForm({
           text-transform: uppercase;
           color: var(--color-text-muted);
           margin-bottom: 7px;
+        }
+        .cf-group-label {
+          font-size: 11.5px;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--color-text-muted);
+          margin-bottom: 10px;
+          display: block;
+        }
+        .cf-checkbox-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px 16px;
+        }
+        .cf-checkbox-item {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          cursor: pointer;
+          user-select: none;
+        }
+        .cf-checkbox-item input[type="checkbox"] {
+          width: 16px;
+          height: 16px;
+          border-radius: 4px;
+          border: 1.5px solid var(--color-border);
+          accent-color: var(--color-brand-primary);
+          cursor: pointer;
+          flex-shrink: 0;
+        }
+        .cf-checkbox-item span {
+          font-size: 13.5px;
+          color: var(--color-text-secondary);
+          line-height: 1.3;
+        }
+        .cf-checkbox-item:hover span { color: var(--color-text-primary); }
+        .cf-divider {
+          height: 1px;
+          background: var(--color-border);
+          margin: 2px 0;
         }
         .cf-field-error {
           font-size: 12px;
@@ -137,12 +206,8 @@ export default function ContactForm({
           font-size: 13.5px;
           line-height: 1.5;
         }
-        @keyframes cf-spin {
-          to { transform: rotate(360deg); }
-        }
-        .cf-spinner {
-          animation: cf-spin 0.75s linear infinite;
-        }
+        @keyframes cf-spin { to { transform: rotate(360deg); } }
+        .cf-spinner { animation: cf-spin 0.75s linear infinite; }
         .cf-btn {
           display: flex;
           align-items: center;
@@ -165,11 +230,7 @@ export default function ContactForm({
           background: var(--color-brand-primary-dark);
           transform: scale(1.02);
         }
-        .cf-btn:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-          transform: none;
-        }
+        .cf-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
       `}</style>
 
       <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] shadow-[var(--shadow-deep)] overflow-hidden">
@@ -194,7 +255,7 @@ export default function ContactForm({
               Message sent!
             </h3>
             <p className="text-[14px] text-[var(--color-text-muted)] leading-relaxed mb-6">
-              Thanks, {form.name.split(" ")[0]}. We&apos;ll be in touch within a few hours.
+              Thanks, {form.firstName}. We&apos;ll be in touch within a few hours.
             </p>
             <button
               onClick={handleReset}
@@ -204,43 +265,45 @@ export default function ContactForm({
             </button>
           </div>
         ) : (
-          /* ── Form ── */
           <form onSubmit={handleSubmit} noValidate className="px-7 py-6 flex flex-col gap-5">
 
+            {/* First + Last Name */}
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="cf-label" htmlFor="cf-name">Your Name</label>
+                <label className="cf-label" htmlFor="cf-firstName">First Name <span style={{ color: "#dc2626" }}>*</span></label>
                 <input
-                  id="cf-name"
+                  id="cf-firstName"
                   className="cf-input"
                   type="text"
-                  name="name"
-                  placeholder="John Smith"
-                  value={form.name}
+                  name="firstName"
+                  placeholder="John"
+                  value={form.firstName}
                   onChange={handleChange}
                   disabled={isLoading}
-                  autoComplete="name"
+                  autoComplete="given-name"
                   required
                 />
               </div>
               <div>
-                <label className="cf-label" htmlFor="cf-phone">Phone Number</label>
+                <label className="cf-label" htmlFor="cf-lastName">Last Name <span style={{ color: "#dc2626" }}>*</span></label>
                 <input
-                  id="cf-phone"
+                  id="cf-lastName"
                   className="cf-input"
-                  type="tel"
-                  name="phone"
-                  placeholder="403 000 0000"
-                  value={form.phone}
+                  type="text"
+                  name="lastName"
+                  placeholder="Smith"
+                  value={form.lastName}
                   onChange={handleChange}
                   disabled={isLoading}
-                  autoComplete="tel"
+                  autoComplete="family-name"
+                  required
                 />
               </div>
             </div>
 
+            {/* Email */}
             <div>
-              <label className="cf-label" htmlFor="cf-email">Email Address</label>
+              <label className="cf-label" htmlFor="cf-email">Email <span style={{ color: "#dc2626" }}>*</span></label>
               <input
                 id="cf-email"
                 className="cf-input"
@@ -255,23 +318,68 @@ export default function ContactForm({
               />
             </div>
 
+            {/* Vehicle */}
             <div>
-              <label className="cf-label">Service Needed</label>
-              <ServiceSelect
-                value={form.service}
+              <label className="cf-label" htmlFor="cf-vehicle">Vehicle Year, Make &amp; Model <span style={{ color: "#dc2626" }}>*</span></label>
+              <input
+                id="cf-vehicle"
+                className="cf-input"
+                type="text"
+                name="vehicle"
+                placeholder="e.g. 2021 Ford F-150"
+                value={form.vehicle}
                 onChange={handleChange}
-                name="service"
                 disabled={isLoading}
+                required
               />
             </div>
 
+            {/* Type of Service Required */}
             <div>
-              <label className="cf-label" htmlFor="cf-message">Message (optional)</label>
+              <span className="cf-group-label">Type of Service Required</span>
+              <div className="cf-checkbox-grid">
+                {SERVICE_TYPES.map((type) => (
+                  <label key={type} className="cf-checkbox-item">
+                    <input
+                      type="checkbox"
+                      checked={form.serviceTypes.includes(type)}
+                      onChange={() => handleCheckbox("serviceTypes", type)}
+                      disabled={isLoading}
+                    />
+                    <span>{type}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="cf-divider" />
+
+            {/* Other Details */}
+            <div>
+              <span className="cf-group-label">Other Details</span>
+              <div className="cf-checkbox-grid">
+                {OTHER_DETAILS.map((detail) => (
+                  <label key={detail} className="cf-checkbox-item">
+                    <input
+                      type="checkbox"
+                      checked={form.otherDetails.includes(detail)}
+                      onChange={() => handleCheckbox("otherDetails", detail)}
+                      disabled={isLoading}
+                    />
+                    <span>{detail}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Comments */}
+            <div>
+              <label className="cf-label" htmlFor="cf-message">Comments and Details</label>
               <textarea
                 id="cf-message"
                 className="cf-textarea"
                 name="message"
-                placeholder="Describe the damage, vehicle make/model, or any questions…"
+                placeholder="Insurance? Damage? Details?"
                 value={form.message}
                 onChange={handleChange}
                 disabled={isLoading}
@@ -308,7 +416,7 @@ export default function ContactForm({
               ) : (
                 <>
                   Send Message &amp; Get Estimate
-                  <ArrowRight size={14} strokeWidth={2.5} style={{ transition: "transform 0.2s" }} />
+                  <ArrowRight size={14} strokeWidth={2.5} />
                 </>
               )}
             </button>
